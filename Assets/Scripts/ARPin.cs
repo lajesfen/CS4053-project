@@ -4,29 +4,32 @@ public class ARPin : MonoBehaviour
 {
     public string PinID { get; private set; }
     public string PinName { get; set; } = "Untitled";
-    private bool isVisible = true;
 
-    private MeshRenderer meshRenderer;
-
-    private void Awake()
-    {
-        meshRenderer = GetComponent<MeshRenderer>();
-    }
-
+    private Renderer _renderer;
     public void Initialize(string id)
     {
         PinID = id;
-        PinName = $"Pin {id.Substring(0, 4)}";
+        PinName = $"Pin #{id.Substring(0, 4)}";
+
+        _renderer = GetComponentInChildren<Renderer>();
     }
 
-    public void SetVisibility(bool visible)
+    public void SetColor(Color color)
     {
-        gameObject.SetActive(visible);
-        isVisible = visible;
+        if (_renderer != null)
+        {
+            color.a = _renderer.material.color.a;
+            _renderer.material.color = color;
+        }
     }
 
-    public void ToggleVisibility()
+    public void SetAlpha(float alpha)
     {
-        SetVisibility(!isVisible);
+        if (_renderer != null)
+        {
+            Color c = _renderer.material.color;
+            c.a = alpha;
+            _renderer.material.color = c;
+        }
     }
 }

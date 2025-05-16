@@ -25,6 +25,8 @@ public class PinManager : MonoBehaviour
 
     public event Action OnActivePinChanged;
 
+    private bool _pinsVisible = false;
+
     private void Awake()
     {
         Instance = this;
@@ -104,29 +106,26 @@ public class PinManager : MonoBehaviour
 
     public void SetActivePin(string pinID)
     {
+        if (_activePinID == pinID) return;
         _activePinID = pinID;
 
-        foreach (var kvp in _pins)
+        foreach (var pin in _pins.Values)
         {
-            kvp.Value.SetVisibility(kvp.Key == pinID);
+            bool isActive = pin.PinID == pinID;
+            pin.SetAlpha(isActive ? 1f : 0.3f);
         }
 
         OnActivePinChanged?.Invoke();
     }
 
-    public void HideAllPins()
+    public void ToggleAllPins()
     {
-        foreach (var pin in _pins.Values)
-        {
-            pin.SetVisibility(false);
-        }
-    }
+        _pinsVisible = !_pinsVisible;
 
-    public void ShowAllPins()
-    {
         foreach (var pin in _pins.Values)
         {
-            pin.SetVisibility(true);
+            if (pin != ActivePin)
+                pin.SetAlpha(_pinsVisible ? 1f : 0.3f);
         }
     }
 }

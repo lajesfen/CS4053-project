@@ -13,7 +13,7 @@ public class PinUIManager : MonoBehaviour
 
     private void Start()
     {
-        hideButton.onClick.AddListener(ToggleCurrentPin);
+        hideButton.onClick.AddListener(ToggleAllPins);
         editButton.onClick.AddListener(EditCurrentPin);
         deleteButton.onClick.AddListener(DeleteCurrentPin);
         listButton.onClick.AddListener(ListAllPins);
@@ -34,14 +34,14 @@ public class PinUIManager : MonoBehaviour
 
     private ARPin GetCurrentPin() => PinManager.Instance.ActivePin;
 
-    private void ToggleCurrentPin()
+    private void ToggleAllPins()
     {
-        GetCurrentPin()?.ToggleVisibility();
+        PinManager.Instance.ToggleAllPins();
     }
 
     private void EditCurrentPin()
     {
-
+        //ToDo: Show Edit Pin UI
     }
 
     private void DeleteCurrentPin()
@@ -68,7 +68,7 @@ public class PinUIManager : MonoBehaviour
 
     private void ListAllPins()
     {
-
+        //ToDo: Show Pins List UI
     }
 
     private void RefreshUI()
