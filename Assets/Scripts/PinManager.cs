@@ -4,19 +4,31 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.EventSystems;
+using System;
 
-public class PinSpawner : MonoBehaviour
+public class PinManager : MonoBehaviour
 {
     [SerializeField] private AROcclusionManager _occlusionManager;
     [SerializeField] private Camera _camera;
     [SerializeField] private GameObject _prefabToSpawn;
 
+    public static PinManager Instance { get; private set; }
     private Matrix4x4 _displayMatrix;
     private XRCpuImage? _depthImage;
     private ScreenOrientation? _latestScreenOrientation;
 
     private Dictionary<string, ARPin> _pins = new();
     private string _activePinID;
+
+    public Dictionary<string, ARPin> Pins => _pins;
+    public ARPin ActivePin => string.IsNullOrEmpty(_activePinID) ? null : _pins.GetValueOrDefault(_activePinID);
+
+    public event Action OnActivePinChanged;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Update()
     {
@@ -79,7 +91,6 @@ public class PinSpawner : MonoBehaviour
             var eyeDepth = _depthImage.Value.Sample<float>(uv, _displayMatrix);
             var worldPosition = _camera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, eyeDepth));
 
-            // Spawn and register pin
             var newPinGO = Instantiate(_prefabToSpawn, worldPosition, Quaternion.identity);
             var pinComponent = newPinGO.AddComponent<ARPin>();
             var pinID = System.Guid.NewGuid().ToString();
@@ -87,7 +98,6 @@ public class PinSpawner : MonoBehaviour
 
             _pins.Add(pinID, pinComponent);
 
-            // Optionally activate this pin by default
             SetActivePin(pinID);
         }
     }
@@ -100,6 +110,8 @@ public class PinSpawner : MonoBehaviour
         {
             kvp.Value.SetVisibility(kvp.Key == pinID);
         }
+
+        OnActivePinChanged?.Invoke();
     }
 
     public void HideAllPins()
