@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 8956031664947139125}
   - component: {fileID: 1380884354374712497}
   - component: {fileID: 4696840382851758161}
+  - component: {fileID: 5634292843992891276}
+  - component: {fileID: 8854751921372809887}
   m_Layer: 0
   m_Name: PinPrefab
   m_TagString: Untagged
@@ -63,6 +65,39 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5634292843992891276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8663023806489062350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50408737aa9df442cba1cd03ec83ab76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!95 &8854751921372809887
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8663023806489062350}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 02709bf08387b4e3e99d105270e87649, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &6943863148693757136
 PrefabInstance:
   m_ObjectHideFlags: 0
