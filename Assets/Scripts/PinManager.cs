@@ -3,6 +3,7 @@ using Niantic.Lightship.AR.Utilities;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.EventSystems;
 
 public class PinSpawner : MonoBehaviour
 {
@@ -59,10 +60,16 @@ public class PinSpawner : MonoBehaviour
 
     private void HandleTouch()
     {
-        if (Input.touchCount <= 0) return;
+        if (Input.touchCount <= 0)
+            return;
 
         var touch = Input.GetTouch(0);
-        if (touch.phase != TouchPhase.Began) return;
+
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+            return;
+
+        if (touch.phase != TouchPhase.Began)
+            return;
 
         var screenPosition = touch.position;
 
