@@ -115,6 +115,7 @@ public class PinManager : MonoBehaviour
             pin.SetAlpha(isActive ? 1f : 0.3f);
         }
 
+        _pinsVisible = false;
         OnActivePinChanged?.Invoke();
     }
 
