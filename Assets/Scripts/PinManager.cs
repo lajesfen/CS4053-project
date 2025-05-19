@@ -14,7 +14,7 @@ public class PinManager : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private GameObject _prefabToSpawn;
 
-    public string archivo; // 
+    public string archivo;
 
     public static PinManager Instance { get; private set; }
     private Matrix4x4 _displayMatrix;
@@ -30,11 +30,6 @@ public class PinManager : MonoBehaviour
     public event Action OnActivePinChanged;
 
     private bool _pinsVisible = false;
-
-    //private void Awake()
-    //{
-    //    Instance = this;
-    //}
 
     private void Update()
     {
@@ -134,12 +129,13 @@ public class PinManager : MonoBehaviour
         }
     }
 
-    // ----------------------------------------------- 
+    // -----------------------------------------------
     // Clase auxiliar para representar un pin serializable
     [Serializable]
     public class PinData
     {
         public string id;
+        public string name;
         public Vector3 position;
         public Quaternion rotation;
     }
@@ -150,35 +146,36 @@ public class PinManager : MonoBehaviour
     {
         public List<PinData> pins = new();
     }
-
     private Datos datos;
 
     private void Awake()
     {
         Instance = this;
-        archivo = Application.dataPath + "/datapin.json";
+        archivo = Path.Combine(Application.persistentDataPath, "datapin.json");
     }
 
     private void CargarDatos()
     {
-        if (File.Exists(archivo))
+        if (!File.Exists(archivo))
         {
-            string contenido = File.ReadAllText(archivo);
-            datos = JsonUtility.FromJson<Datos>(contenido);
+            Debug.Log("El archivo no existe.");
+            return;
+        }
 
-            foreach (var pinData in datos.pins)
-            {
-                var go = Instantiate(_prefabToSpawn, pinData.position, pinData.rotation);
-                var pinComponent = go.AddComponent<ARPin>();
-                pinComponent.Initialize(pinData.id);
-                _pins.Add(pinData.id, pinComponent);
-            }
-        }
-        else
+        string contenido = File.ReadAllText(archivo);
+        datos = JsonUtility.FromJson<Datos>(contenido);
+
+        foreach (var pinData in datos.pins)
         {
-            Debug.Log("El archivo no existe");
-            datos = new Datos(); // Inicializado vacío si no existe
+            var go = Instantiate(_prefabToSpawn, pinData.position, pinData.rotation);
+            var pinComponent = go.AddComponent<ARPin>();
+            pinComponent.Initialize(pinData.id);
+            pinComponent.PinName = pinData.name;
+
+            _pins[pinData.id] = pinComponent;
         }
+
+        Debug.Log($"Se cargaron {datos.pins.Count} pins.");
     }
 
     private void Start()
@@ -195,6 +192,7 @@ public class PinManager : MonoBehaviour
             PinData pd = new PinData
             {
                 id = pin.PinID,
+                name = pin.PinName,
                 position = pin.transform.position,
                 rotation = pin.transform.rotation
             };
@@ -203,6 +201,7 @@ public class PinManager : MonoBehaviour
 
         string cadenaJSON = JsonUtility.ToJson(newDatos);
         File.WriteAllText(archivo, cadenaJSON);
+        Debug.Log("Pins guardados.");
     }
 
     private void OnApplicationQuit()
