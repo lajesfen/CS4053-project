@@ -6,11 +6,15 @@ using UnityEngine.XR.ARSubsystems;
 using UnityEngine.EventSystems;
 using System;
 
+using System.IO;
+
 public class PinManager : MonoBehaviour
 {
     [SerializeField] private AROcclusionManager _occlusionManager;
     [SerializeField] private Camera _camera;
     [SerializeField] private GameObject _prefabToSpawn;
+
+    public string archivo; // 
 
     public static PinManager Instance { get; private set; }
     private Matrix4x4 _displayMatrix;
@@ -27,10 +31,10 @@ public class PinManager : MonoBehaviour
 
     private bool _pinsVisible = false;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    //private void Awake()
+    //{
+    //    Instance = this;
+    //}
 
     private void Update()
     {
@@ -129,4 +133,81 @@ public class PinManager : MonoBehaviour
                 pin.SetAlpha(_pinsVisible ? 1f : 0.3f);
         }
     }
+
+    // ----------------------------------------------- 
+    // Clase auxiliar para representar un pin serializable
+    [Serializable]
+    public class PinData
+    {
+        public string id;
+        public Vector3 position;
+        public Quaternion rotation;
+    }
+
+    // Clase contenedora para serializar/deserializar varios pines
+    [Serializable]
+    public class Datos
+    {
+        public List<PinData> pins = new();
+    }
+
+    private Datos datos;
+
+    private void Awake()
+    {
+        Instance = this;
+        archivo = Application.dataPath + "/datapin.json";
+    }
+
+    private void CargarDatos()
+    {
+        if (File.Exists(archivo))
+        {
+            string contenido = File.ReadAllText(archivo);
+            datos = JsonUtility.FromJson<Datos>(contenido);
+
+            foreach (var pinData in datos.pins)
+            {
+                var go = Instantiate(_prefabToSpawn, pinData.position, pinData.rotation);
+                var pinComponent = go.AddComponent<ARPin>();
+                pinComponent.Initialize(pinData.id);
+                _pins.Add(pinData.id, pinComponent);
+            }
+        }
+        else
+        {
+            Debug.Log("El archivo no existe");
+            datos = new Datos(); // Inicializado vacío si no existe
+        }
+    }
+
+    private void Start()
+    {
+        CargarDatos();
+    }
+
+    private void GuardarDatos()
+    {
+        Datos newDatos = new Datos();
+
+        foreach (var pin in _pins.Values)
+        {
+            PinData pd = new PinData
+            {
+                id = pin.PinID,
+                position = pin.transform.position,
+                rotation = pin.transform.rotation
+            };
+            newDatos.pins.Add(pd);
+        }
+
+        string cadenaJSON = JsonUtility.ToJson(newDatos);
+        File.WriteAllText(archivo, cadenaJSON);
+    }
+
+    private void OnApplicationQuit()
+    {
+        GuardarDatos();
+    }
+
 }
